@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List App</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .todo-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+
+    .todo-item {
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      word-wrap: break-word; /* Add this line */
+    }
+    
+
+    .todo-item input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
+    .add-todo {
+      display: flex;
+      margin-top: 20px;
+    }
+
+    .add-todo input {
+      flex: 1;
+      padding: 8px;
+      margin-right: 10px;
+    }
+
+    .add-todo button {
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .removeTodo {
+      width: 20px;
+      height: 20px;
+      background-color: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    @media (max-width: 400px) {
+      .todo-container {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="todo-container">
+  <h2>Welcome to <span id="userName" class="userName"></span> Todolist</h2>
+  <div class="add-todo">
+    <input type="text" id="newTodo" placeholder="Add a new task">
+    <button id="addTodoButton">Add</button>
+  </div>
+  <br>
+
+  <!-- add to the todos -->
+  <div class="SPAN" id="addTodoContainer"></div>
+</div>
+
+<script>
+  const loadingUrl = 'http://192.168.7.12:4000/getTodo';
+
+  function loadTodo(url) {
+    fetch(url)
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        console.log(data)
+        const [accountName, rows, tableName] = data;
+        console.log(tableName)
+        document.getElementById('userName').innerHTML = accountName;
+        document.getElementById('addTodoContainer').innerHTML = '';
+        for (var i = 0; i < rows.length; i++) {
+          document.getElementById('addTodoContainer').innerHTML += `
+          <div class="todo-item">
+            <input type="checkbox" id="${rows[i].id}">
+            <button class="removeTodo" id="removeTodo" onclick="deleteTodo(${rows[i].id})" >-</button>
+            <br>
+            <label for="todo2">${rows[i].todo}</label>
+          </div>`;
+        }
+      })
+  }
+
+  window.onload = function () {
+    loadTodo(loadingUrl); // Run the function on page load
+  };
+
+  window.addEventListener('load', async (e) => {
+    loadTodo(loadingUrl)
+  })
+
+  const addTodoUrl = 'http://192.168.7.12:4000/addTodo'
+
+  function addTodo(todoItem) {
+    fetch(addTodoUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ todo: todoItem }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+        document.getElementById('addTodoContainer').innerHTML = '';
+        for (var i = 0; i < data.length; i++) {
+          document.getElementById('addTodoContainer').innerHTML += `
+          <div class="todo-item">
+            <input type="checkbox" id="${data[i].id}">
+            <button class="removeTodo" id="removeTodo" onclick="deleteTodo(${data[i].id})" >-</button>
+            <label for="todo2">${data[i].todo}</label>
+          </div>`;
+        }
+        document.getElementById('newTodo').value = '';
+      })
+      .catch((error) => console.log('Error:', error));
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Enter') {
+      if (document.getElementById('newTodo').value === '') {
+        alert('Enter a valid todo');
+      } else {
+        addTodo(document.getElementById('newTodo').value);
+      }
+    }
+  });
+
+  document.getElementById('addTodoButton').onclick = function () {
+    addTodo(document.getElementById('newTodo').value);
+  };
+
+  const deleteTodoUrl = 'http://192.168.7.12:4000/deleteTodo'
+
+
+  async function deleteTodo(id){
+    fetch(deleteTodoUrl,{
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({deleteTodoId:id})
+    })
+    .then((response)=>{
+      return response.json();
+    })
+    .then((data)=>{
+        for (var i = 0; i < data.length; i++) {
+          document.getElementById('addTodoContainer').innerHTML = '';
+          console.log(data)
+          document.getElementById('addTodoContainer').innerHTML += `
+          <div class="todo-item">
+            <input type="checkbox" id="${data[i].id}">
+            <button class="removeTodo" id="removeTodo" onclick="deleteTodo(${data[i].id})" >-</button>
+            <label for="todo2">${data[i].todo}</label>
+          </div>`;
+        }
+        window.location.reload();
+    })
+  }
+
+
+</script>
+</body>
+</html>

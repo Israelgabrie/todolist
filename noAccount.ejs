@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>No Account Found - Error Page</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f8f8;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .error-container {
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .error-container h2 {
+      color: #ff4646;
+    }
+
+    .error-message {
+      color: #555;
+      margin-top: 10px;
+    }
+
+    .back-to-login {
+      margin-top: 20px;
+    }
+
+    .back-to-login a {
+      color: #4caf50;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="error-container">
+  <h2>No Account Found</h2>
+  
+  <p class="error-message">Sorry, we couldn't find an account with the provided email. Please check your email or <a href="#" onclick="goBack()">go back</a> to the login page.</p>
+
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+
+</div>
+
+</body>
+</html>
